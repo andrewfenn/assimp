@@ -332,6 +332,9 @@ SET( Ogre_SRCS
 	OgreMaterial.cpp
 	OgreMesh.cpp
 	OgreSkeleton.cpp
+
+	OgreExporter.h
+	OgreExporter.cpp
 )
 SOURCE_GROUP( Ogre FILES ${Ogre_SRCS})
 
