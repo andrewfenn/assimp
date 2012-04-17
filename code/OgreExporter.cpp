@@ -179,28 +179,18 @@ void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
     Attribute(aiString("colours_specular"), hasSpecular);
 
     Attribute(aiString("texture_coords"), m->GetNumUVChannels());
-
-    // Assimp only holds one texcoord per mesh
-   // if (m->GetNumUVChannels() > 0)
-        
-
-/*
-
-	texture_coords				(0|1|2|3|4|5|6|7|8) 	"0"
-	texture_coord_dimensions_0 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	texture_coord_dimensions_1 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	texture_coord_dimensions_2 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	texture_coord_dimensions_3 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	texture_coord_dimensions_4 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	texture_coord_dimensions_5 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	texture_coord_dimensions_6 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	texture_coord_dimensions_7 = (1|2|3|4|float1|float2|float3|float4|short1|short2|short3|short4|ubyte4|colour|colour_argb|colour_abgr) "2"
-	tangents					(true|false)	"false"
-	tangent_dimensions			(3|4)			"3"
-	binormals					(true|false)	"false"
+    for(unsigned int i = 0; i < m->GetNumUVChannels(); ++i) {
+        Attribute(aiString("texture_coord_dimensions_"+boost::lexical_cast<std::string>(i)),
+                  aiString("float"+boost::lexical_cast<std::string> (m->mNumUVComponents[i])) );
+    }
     
-    
-    </vertexbuffer>*/
+    if (m->HasTangentsAndBitangents())
+    {
+        Attribute(aiString("tangents"), true);
+        Attribute(aiString("tangent_dimensions"), 3u);
+    }
+    Attribute(aiString("binormals"), m->HasNormals());
+
     mOutput << ">" << endl;
     tab(4); mOutput << "</vertexbuffer>" << endl;
 }
