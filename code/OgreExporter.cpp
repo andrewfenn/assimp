@@ -95,7 +95,29 @@ void OgreExporter::tab(int num) {
     tab(--num);
 }
 
-void OgreExporter :: Attribute(const aiString name, unsigned int value)
+void OgreExporter :: Tag(const aiString name, const aiVector3D value)
+{
+    mOutput << "<" << name.C_Str() << " ";
+    mOutput << "x=\"" << value.x << "\" ";
+    mOutput << "y=\"" << value.y << "\" ";
+    mOutput << "z=\"" << value.z << "\" />";
+}
+
+void OgreExporter :: TagTex(const aiString name, const aiVector3D value)
+{
+    mOutput << "<" << name.C_Str() << " ";
+    mOutput << "u=\"" << value.x << "\" ";
+    mOutput << "v=\"" << value.y << "\" ";
+    mOutput << "w=\"" << value.z << "\" />";
+}
+
+void OgreExporter :: Tag(const aiString name, const aiColor4D value)
+{
+    mOutput << "<" << name.C_Str() << " ";
+    mOutput << "value=\"" << value.r << " " << value.g << " " << value.b << " " << value.a << "\" />";
+}
+
+void OgreExporter :: Attribute(const aiString name, const unsigned int value)
 {
     mOutput << " " << name.C_Str() << "=\"" << value << "\"";
 }
@@ -147,13 +169,13 @@ void OgreExporter :: WriteSubMesh(const aiMesh* m, const aiScene* p)
 
     tab(3); mOutput << "<geometry vertexcount=\"" << m->mNumVertices << "\">" << endl;
     
-    WriteVertices(m,p);
+    WriteVertexBuffer(m,p);
     
     tab(3); mOutput << "</geometry>" << endl;
     tab(2); mOutput << "</submesh>" << endl;
 }
 // ------------------------------------------------------------------------------------------------
-void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
+void OgreExporter :: WriteVertexBuffer(const aiMesh* m, const aiScene* p)
 {
     tab(4); mOutput << "<vertexbuffer";
     
@@ -165,25 +187,29 @@ void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
   	material = p->mMaterials[m->mMaterialIndex];
   	
     aiColor4D diffuse;
-    bool hasDiffuse;
+
+    mHasDiffuse = false;
     if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse)) {
-        hasDiffuse = true;
+        mHasDiffuse = true;
     }
-    Attribute(aiString("colours_diffuse"), hasDiffuse);
+    Attribute(aiString("colours_diffuse"), mHasDiffuse);
 
     aiColor4D specular;
-    bool hasSpecular;
-    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular)) {
-        hasSpecular = true;
-    }
-    Attribute(aiString("colours_specular"), hasSpecular);
 
-    Attribute(aiString("texture_coords"), m->GetNumUVChannels());
-    for(unsigned int i = 0; i < m->GetNumUVChannels(); ++i) {
-        Attribute(aiString("texture_coord_dimensions_"+boost::lexical_cast<std::string>(i)),
-                  aiString("float"+boost::lexical_cast<std::string> (m->mNumUVComponents[i])) );
+    mHasSpecular = false;
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular)) {
+        mHasSpecular = true;
     }
-    
+    Attribute(aiString("colours_specular"), mHasSpecular);
+
+    unsigned int total_texcoords;
+    for(total_texcoords = 0; m->HasTextureCoords(total_texcoords); ++total_texcoords)
+    {
+        Attribute(aiString("texture_coord_dimensions_"+boost::lexical_cast<std::string>(total_texcoords)),
+                  aiString("float"+boost::lexical_cast<std::string> (m->mNumUVComponents[total_texcoords])) );
+    }
+    Attribute(aiString("texture_coords"), total_texcoords);
+
     if (m->HasTangentsAndBitangents())
     {
         Attribute(aiString("tangents"), true);
@@ -192,7 +218,50 @@ void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
     Attribute(aiString("binormals"), m->HasNormals());
 
     mOutput << ">" << endl;
+
+    WriteVertices(m,p);
+
     tab(4); mOutput << "</vertexbuffer>" << endl;
+}
+// ------------------------------------------------------------------------------------------------
+void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
+{
+    for(unsigned int i = 0; i < m->mNumVertices; ++i) {
+        
+        tab(5); mOutput << "<vertex>" << endl;
+        if (m->HasPositions()) { 
+            tab(6); Tag(aiString("position"), m->mVertices[i]); mOutput << endl;
+        }
+        if (m->HasNormals()) { 
+            tab(6); Tag(aiString("normal"), m->mNormals[i]); mOutput << endl;
+        }
+        if (m->HasTangentsAndBitangents())
+        {
+            tab(6); Tag(aiString("tangent"), m->mTangents[i]); mOutput << endl;
+            tab(6); Tag(aiString("binormal"), m->mBitangents[i]); mOutput << endl;
+        }
+/*        if (mHasDiffuse)
+        {
+            tab(6); Tag(aiString("colour_diffuse"), m->mColors[m->mMaterialIndex][i]); mOutput << endl;
+        }
+        tab(5); mOutput << "</vertex>" << endl;
+        if (mHasSpecular)
+        {
+            tab(6); Tag(aiString("colour_specular"), m->mColors[m->mMaterialIndex][i]); mOutput << endl;
+        }
+        tab(5); mOutput << "</vertex>" << endl;
+        
+*/
+        if (m->HasTangentsAndBitangents())
+        {
+            tab(6); Tag(aiString("tangent"), m->mTangents[i]); mOutput << endl;
+            tab(6); Tag(aiString("binormal"), m->mBitangents[i]); mOutput << endl;
+        }
+        for(unsigned int tex= 0; m->HasTextureCoords(tex); ++tex)
+        {
+            tab(6); TagTex(aiString("texcoord"), m->mTextureCoords[tex][i]); mOutput << endl;
+        }
+    }
 }
 // ------------------------------------------------------------------------------------------------
 void OgreExporter :: WriteFaces(const aiMesh* m)

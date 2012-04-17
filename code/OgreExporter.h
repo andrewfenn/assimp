@@ -72,10 +72,15 @@ private:
 	
 	void WriteSubMesh(const aiMesh* m, const aiScene* p);
     void WriteFaces(const aiMesh* m);
+    void WriteVertexBuffer(const aiMesh* m, const aiScene* p);
     void WriteVertices(const aiMesh* m, const aiScene* p);
     void tab(int num);
     
-    void Attribute(const aiString name, unsigned int value);
+    void Tag(const aiString name, const aiVector3D value);
+    void TagTex(const aiString name, const aiVector3D value);
+    void Tag(const aiString name, const aiColor4D value);
+    
+    void Attribute(const aiString name, const unsigned int value);
     void Attribute(const aiString name, const aiString value);
     void Attribute(const aiString name, const bool value);
 
@@ -84,6 +89,9 @@ private:
 
 	// this endl() doesn't flush() the stream
 	const std::string endl;
+	
+    bool mHasSpecular;
+    bool mHasDiffuse;
 };
 
 }
