@@ -69,8 +69,15 @@ public:
 private:
 
 	void WriteMesh(const aiMesh* m, const aiScene* p);
-
-private:
+	
+	void WriteSubMesh(const aiMesh* m, const aiScene* p);
+    void WriteFaces(const aiMesh* m);
+    void WriteVertices(const aiMesh* m, const aiScene* p);
+    void tab(int num);
+    
+    void Attribute(const aiString name, unsigned int value);
+    void Attribute(const aiString name, const aiString value);
+    void Attribute(const aiString name, const bool value);
 
 	const std::string filename;
 	const aiScene* const pScene;
