@@ -77,7 +77,7 @@ private:
     void tab(int num);
     
     void Tag(const aiString name, const aiVector3D value);
-    void TagTex(const aiString name, const aiVector3D value);
+    void TagTex(const aiString name, const aiVector3D value, const unsigned int numUV);
     void Tag(const aiString name, const aiColor4D value);
     
     void Attribute(const aiString name, const unsigned int value);

@@ -103,12 +103,23 @@ void OgreExporter :: Tag(const aiString name, const aiVector3D value)
     mOutput << "z=\"" << value.z << "\" />";
 }
 
-void OgreExporter :: TagTex(const aiString name, const aiVector3D value)
+void OgreExporter :: TagTex(const aiString name, const aiVector3D value, const unsigned int numUV)
 {
     mOutput << "<" << name.C_Str() << " ";
     mOutput << "u=\"" << value.x << "\" ";
+    if (numUV < 2)
+    {
+        mOutput << "/>";
+        return;
+    }
     mOutput << "v=\"" << value.y << "\" ";
-    mOutput << "w=\"" << value.z << "\" />";
+    if (numUV < 3)
+    {
+        mOutput << "/>";
+        return;
+    }
+    mOutput << "w=\"" << value.z << "\" ";
+    mOutput << "/>";
 }
 
 void OgreExporter :: Tag(const aiString name, const aiColor4D value)
@@ -240,18 +251,16 @@ void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
             tab(6); Tag(aiString("tangent"), m->mTangents[i]); mOutput << endl;
             tab(6); Tag(aiString("binormal"), m->mBitangents[i]); mOutput << endl;
         }
-/*        if (mHasDiffuse)
+/*
+        if (mHasDiffuse)
         {
             tab(6); Tag(aiString("colour_diffuse"), m->mColors[m->mMaterialIndex][i]); mOutput << endl;
         }
-        tab(5); mOutput << "</vertex>" << endl;
         if (mHasSpecular)
         {
             tab(6); Tag(aiString("colour_specular"), m->mColors[m->mMaterialIndex][i]); mOutput << endl;
-        }
-        tab(5); mOutput << "</vertex>" << endl;
-        
-*/
+        }*/
+
         if (m->HasTangentsAndBitangents())
         {
             tab(6); Tag(aiString("tangent"), m->mTangents[i]); mOutput << endl;
@@ -259,8 +268,9 @@ void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
         }
         for(unsigned int tex= 0; m->HasTextureCoords(tex); ++tex)
         {
-            tab(6); TagTex(aiString("texcoord"), m->mTextureCoords[tex][i]); mOutput << endl;
+            tab(6); TagTex(aiString("texcoord"), m->mTextureCoords[tex][i], m->mNumUVComponents[tex]); mOutput << endl;
         }
+        tab(5); mOutput << "</vertex>" << endl;
     }
 }
 // ------------------------------------------------------------------------------------------------
