@@ -19,7 +19,7 @@ SOURCE_GROUP( Compiler FILES ${COMPILER_HEADERS})
 
 SET( PUBLIC_HEADERS
 	${HEADER_PATH}/anim.h
-	${HEADER_PATH}/assert.h
+	${HEADER_PATH}/ai_assert.h
 	${HEADER_PATH}/camera.h
 	${HEADER_PATH}/color4.h
 	${HEADER_PATH}/color4.inl
@@ -46,6 +46,7 @@ SET( PUBLIC_HEADERS
 	${HEADER_PATH}/vector3.inl
 	${HEADER_PATH}/version.h
 	${HEADER_PATH}/cimport.h
+	${HEADER_PATH}/importerdesc.h
 	${HEADER_PATH}/Importer.hpp
 	${HEADER_PATH}/DefaultLogger.hpp
 	${HEADER_PATH}/ProgressHandler.hpp

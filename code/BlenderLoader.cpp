@@ -71,16 +71,17 @@ using namespace Assimp;
 using namespace Assimp::Blender;
 using namespace Assimp::Formatter;
 
-static const aiLoaderDesc blenderDesc = {
+static const aiImporterDesc blenderDesc = {
 	"Blender 3D Importer \nhttp://www.blender3d.org",
-	"Assimp Team",
 	"",
 	"",
-	aiLoaderFlags_SupportBinaryFlavour | aiLoaderFlags_Experimental,
+	"No animation support yet",
+	aiImporterFlags_SupportBinaryFlavour,
 	0,
 	0,
 	2,
-	50
+	50,
+	"blend"
 };
 
 
@@ -123,9 +124,9 @@ void BlenderImporter::GetExtensionList(std::set<std::string>& app)
 
 // ------------------------------------------------------------------------------------------------
 // Loader registry entry
-const aiLoaderDesc& BlenderImporter::GetInfo () const
+const aiImporterDesc* BlenderImporter::GetInfo () const
 {
-	return blenderDesc;
+	return &blenderDesc;
 }
 
 // ------------------------------------------------------------------------------------------------

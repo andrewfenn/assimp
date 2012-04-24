@@ -106,6 +106,29 @@ void BaseImporter::SetupProperties(const Importer* /*pImp*/)
 }
 
 // ------------------------------------------------------------------------------------------------
+void BaseImporter::GetExtensionList(std::set<std::string>& extensions)
+{
+	const aiImporterDesc* desc = GetInfo();
+	ai_assert(desc != NULL);
+
+	const char* ext = desc->mFileExtensions;
+	ai_assert(ext != NULL);
+
+	const char* last = ext;
+	do {
+		if (!*ext || *ext == ' ') {
+			extensions.insert(std::string(last,ext-last));
+			ai_assert(ext-last > 0);
+			last = ext;
+			while(*last == ' ') {
+				++last;
+			}
+		}
+	}
+	while(*ext++);
+}
+
+// ------------------------------------------------------------------------------------------------
 /*static*/ bool BaseImporter::SearchFileHeaderForToken(IOSystem* pIOHandler,
 	const std::string&	pFile,
 	const char**		tokens, 

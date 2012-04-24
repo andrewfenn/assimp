@@ -51,6 +51,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace Assimp;
 
+static const aiImporterDesc desc = {
+	"Collada Importer",
+	"",
+	"",
+	"",
+	aiImporterFlags_SupportTextFlavour | aiImporterFlags_SupportBinaryFlavour | aiImporterFlags_SupportCompressedFlavour,
+	1,
+	3,
+	1,
+	5,
+	"x" 
+};
+
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 XFileImporter::XFileImporter()
@@ -78,9 +91,10 @@ bool XFileImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, boo
 }
 
 // ------------------------------------------------------------------------------------------------
-void XFileImporter::GetExtensionList(std::set<std::string>& extensions)
+// Get file extension list
+const aiImporterDesc* XFileImporter::GetInfo () const
 {
-	extensions.insert("x");
+	return &desc;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -341,7 +355,7 @@ void XFileImporter::CreateMeshes( aiScene* pScene, aiNode* pNode, const std::vec
 			}
 
 			// there should be as much new vertices as we calculated before
-			assert( newIndex == numVertices);
+			ai_assert( newIndex == numVertices);
 
 			// convert all bones of the source mesh which influence vertices in this newly created mesh
 			const std::vector<XFile::Bone>& bones = sourceMesh->mBones;
