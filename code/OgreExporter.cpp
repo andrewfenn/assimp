@@ -282,7 +282,6 @@ void OgreExporter :: WriteVertices(const aiMesh* m, const aiScene* p)
         
         tab(5); mOutput << "<vertex>" << endl;
         if (m->HasPositions()) { 
-            m->mVertices[i].y *=-1;
             tab(6); Tag(aiString("position"), m->mVertices[i]); mOutput << endl;
         }
         if (m->HasNormals()) {
